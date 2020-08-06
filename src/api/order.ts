@@ -28,6 +28,11 @@ export default ({ config, db }) => resource({
     const ajv = new Ajv();
     require('ajv-keywords')(ajv, 'regexp');
 
+    let token = null
+    if (req.query && req.query.token) {
+        token = req.query.token
+    }
+
     const orderSchema = require('../models/order.schema.js')
     let orderSchemaExtension = {}
     if (fs.existsSync(path.resolve(__dirname, '../models/order.schema.extension.json'))) {
@@ -77,7 +82,7 @@ export default ({ config, db }) => resource({
       }
     } else {
       const orderProxy = _getProxy(req, config)
-      orderProxy.create(req.body).then((result) => {
+      orderProxy.create(req.body, token).then((result) => {
         apiStatus(res, result, 200);
       }).catch(err => {
         apiError(res, err);
